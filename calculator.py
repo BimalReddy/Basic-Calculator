@@ -1,4 +1,5 @@
 import math
+import re
 
 def calculator():
     print("Interactive Calculator")
@@ -13,7 +14,14 @@ def calculator():
         "__builtins__": None,
         "sin": math.sin,
         "cos": math.cos,
+        "tan": math.tan,
         "radians": math.radians,
+        "sqrt": math.sqrt,
+        "log": math.log,
+        "log10": math.log10,
+        "factorial": math.factorial,
+        "abs":abs,
+        "e": math.e,
         "pi": math.pi,
         "ans": 0,
     }
