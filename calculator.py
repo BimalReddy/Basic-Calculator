@@ -1,14 +1,12 @@
 import math
-import re
 
-def calculator():
-    print("Interactive Calculator")
-    print("Arithmetic: +, -, *, /, **(power), ()")
-    print("Trigonometry: sin(x), cos(x), radians(x), pi")
-    print("- Type an operator first to continue with your last result")
-    print("- Use 'ans' inside an equation to insert your last result")
-    print("- Type a number to start a fresh calculation")
-    print("- Type 'c' to clear memory or 'q' to quit")
+def evaluate_expression(expr: str, current_ans: float | int=0) -> tuple[float | int | None, str | None]:
+    expr = expr.strip()
+    if not expr:
+        return None, None
+
+    if expr.startswith(('+', '-', '*', '/', '**')):
+        expr = f"ans{expr}"
 
     safe_dict= {
         "__builtins__": None,
@@ -26,27 +24,17 @@ def calculator():
         "ans": 0,
     }
 
-    while True:
-        user_input= input("Calculate: ").strip()
-        if user_input.lower() == 'q':
-            print("Closing the calculator, Bye!")
-            break
-        if user_input.lower() == 'c':
-            safe_dict["ans"]=0
-            print("Memory cleared")
-            continue
-        if not user_input:
-            continue
-        if user_input.startswith(('+', '-', '*', '/', '**')):
-            user_input =f"ans{user_input}"
-        try:
-            result = eval(user_input, safe_dict, {})
-            print(f"Result: {result}")
-            safe_dict["ans"]= result
-        except ZeroDivisionError:
-            print("Error: division by zero isn't allowed")
-        except Exception:
-            print("Error: check your syntax")
+    try:
+        result = eval(expr, safe_dict, {})
+        return result, None
+    except ZeroDivisionError:
+        return None, "Error: division by zero isnt allowed"
+    except Exception:
+        return None, "Error: check your synatx"
 
 if __name__ == "__main__":
-    calculator()
+    
+    #quick tests
+    print(evaluate_expression("sin(radians(90))"))
+    print(evaluate_expression("*2", current_ans=65))
+    print(evaluate_expression("1/0"))
