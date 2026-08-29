@@ -4,8 +4,171 @@
     <meta charset="UTF-8">
     <meta name="viewprt" content="initial-scale=1.0">
     <title>Calculator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: sans-serif, Verdana, Geneva, Tahoma;
+        }
+
+        body{
+            background-color: #121212;
+            color: #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items:center;
+            min-height: 100vh;
+        }
+
+        .calculator-card{
+            background-color: #1e1e1e ;
+            width: 100%;
+            max-width: 420px;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+        }
+
+        .display-container {
+            background-color: #0a0a0a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px
+        }
+
+        .status-bar {
+            font-size: 0.85rem;
+            color: #888;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .history-log {
+            min-height: 60px;
+            max-height: 120px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 0.95rem;
+            margin-bottom: 12px;
+        }
+
+        .history-item{
+            margin-bottom: 4px;
+        }
+
+        .history-item.error{
+            color: #ff6b6b;
+        }
+
+         .history-item.success{
+            color: #51cf66;
+        }
+
+        .input-group{
+            display: flex;
+            gap: 8px;
+        }
+
+        input[type="text"]{
+            flex: 1;
+            background-color: #121212;
+            border: 1px solid #444;
+            color: #fff;
+            padding: 10px 12px;
+            font-size: 1rem;
+            border-radius: 6pc;
+            outline: none;
+        }
+
+        .numpad{
+            display: grid;
+            grid-template-columns: repeat(4,1fr);
+            gap: 10px;
+        }
+
+        button{
+            background-color: #2b2b2b;
+            color: #fff;
+            border: none;
+            padding: 14px;
+            font-size: 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button:hover{
+            background-color: #3d3d3d;
+        }
+    
+        button.op{
+            background-color: #3b5bdb;
+        }
+
+        button.op:hover{
+            background-color: #4c6ef5;
+        }
+
+        button.action{
+            background-color: #e03131;
+        }
+
+        button.action:hover{
+            background-color: #f03e3e;
+        }
+    </style>
 </head>
 <body>
-    
+<div class="calculator-card">
+    <div class="display-container">
+        <div class="status-bar">
+                <span>State: <strong id="ans-display">asn = 0</strong></span>
+        </div>
+
+        <div id="history-log" class="history-log">
+            <div class="history-item">Type an expression or use the numpad</div>
+        </div>
+
+        <div class="input-group">
+            <input type="text" id="calc-input">
+            <button id="send-btn" class="op">==</button>
+        </div>
+    </div>
+
+    <div class="numpad">
+        <button class="action" data-val="clear">C</button>
+        <button data-val="(">(</button>
+        <button data-val=")">)</button>
+        <button class="op" data-val="/">/</button>
+
+        <button data-val="7">7</button>
+        <button data-val="8">8</button>
+        <button data-val="9">9</button>
+        <button class= "op" data-val="*">*</button>
+
+        <button data-val="4">4</button>
+        <button data-val="5">5</button>
+        <button data-val="6">6</button>
+        <button class= "op" data-val="-">-</button>
+
+        <button data-val="1">1</button>
+        <button data-val="2">2</button>
+        <button data-val="3">3</button>
+        <button class= "op" data-val="+">+</button>
+
+        <button data-val="0">0</button>
+        <button data-val=".">.</button>
+        <button data-val="ans">ans</button>
+        <button class= "op" data-val="**">**</button>
+
+        <button data-val="sin(">sin</button>
+        <button data-val="cos(">cos</button>
+        <button data-val="sqrt(">sqrt</button>
+        <button data-val="pi">pi</button>
+    </div>
+</div>
 </body>
 </html>
