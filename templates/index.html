@@ -63,7 +63,7 @@
             color: #ff6b6b;
         }
 
-         .history-item.success{
+        .history-item.success{
             color: #51cf66;
         }
 
@@ -170,5 +170,79 @@
         <button data-val="pi">pi</button>
     </div>
 </div>
+<script>
+    const calcInput = document.getElementById('calc-input');
+    const sendBtn = document.getElementById('send-btn');
+    const historyLog = document.getElementById('history-log');
+    const ansDisplay = document.getElementById('ans-display');
+    const numpad = document.getElementById('.numpad');
+
+    function logMessage(text, isErorr = false) {
+        const item = document.createElement('div');
+        item.className = `history-item ${isError ? 'error' : 'success'}`;
+        item.textContent = text;
+        historyLog.appendChild(item);
+        historyLog.scrollTop = historyLog.scrollHeight;
+    }
+
+    async function submitCalculation() {
+        const expression = calcInput.value.trim();
+        if (!expression) return;
+
+        try {
+            const response = await fetch('/api/calculate', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({expression: expression})
+            });
+
+            const data = await response.json();
+
+            if(!response.ok) {
+                logMessage(`>${expression} = ${data.error}`, true);
+            }
+            else{
+                logMessage(`> ${expression} = ${data.result}`);
+                ansDisplay.textContent = `ans = ${data.ans}`;
+                calcInput.value='';
+            }
+        }
+        catch (err){
+            logMessage(`>network error, conencting to API`, true);
+        }
+    }
+
+    async function clearMemory(){
+        try{
+            const response = await fetch('/api/clear', {method: 'POST'});
+            const data = await response.json();
+            ansDisplay.textContent = `ans=${data.ans}`;
+            calcInput.value='';
+            logMessage(`>memory cleared`);
+        }
+        catch(err){
+            logMessage(`failed to reset memory`, true);
+        }
+    }
+
+    numpad.addEventListener('click', (e)=> {
+        if(!e.target.matches('button')) return;
+        const val = e.target.getAttribute('data-val')
+        if (val === 'clear'){
+            clearMemory();}
+        else {
+            calcInput.value +=val;
+            calcInput.focus();
+        }
+    });
+
+    sendBtn.addEventListener('click', submitCalculation)
+
+    calcInput.addEventListener('keydown', (e) =>{
+        if (e.key === 'Enter'){
+            submitCalculation();
+        }
+    });
+</script>
 </body>
 </html>
