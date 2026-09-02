@@ -23,7 +23,7 @@ def calculate():
     if result is not None:
         session["ans"] = result
 
-    return jsonify({"result": error, "ans": session.get("ans")})
+    return jsonify({"result": result, "ans": session.get("ans, 0")})
 
 @app.route("/api/clear", methods=["POST"])
 def clear_memory():

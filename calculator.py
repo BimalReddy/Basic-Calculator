@@ -1,6 +1,7 @@
 import math
 import ast
 import operator
+import re
 
 ALLOWED_OPERATORS= {
     ast.Add: operator.add,
@@ -18,6 +19,9 @@ def eval_ast_node(node, context):
             return node.value
         raise TypeError("Invalid constant type")
 
+    elif hasattr(ast, 'Num') and isinstance(node, ast.Num):
+        return node.n
+
     elif isinstance(node, ast.Name):
         if node.id in context:
             val = context[node.id]
@@ -28,15 +32,15 @@ def eval_ast_node(node, context):
     elif isinstance(node, ast.BinOp):
         op_type = type(node.op)
         if op_type in ALLOWED_OPERATORS:
-            operand = eval_ast_node(node.operand, context)
-            return ALLOWED_OPERATORS[op_type](operand)
+            left = eval_ast_node(node.left, context)
+            right = eval_ast_node(node.right, context)
+            return ALLOWED_OPERATORS[op_type](left, right)
         raise ValueError(f"Unsupported binary operator: {op_type.__name__}")
-
+    
     elif isinstance(node, ast.UnaryOp):
         op_type = type(node.op)
         if op_type in ALLOWED_OPERATORS:
-            left = eval_ast_node(node.left, context)
-            right = eval_ast_node(node.right, context)
+            operand = eval_ast_node(node.operand, context)
             return ALLOWED_OPERATORS[op_type](operand)
         raise ValueError(f"Unsupported binary operator: {op_type.__name__}")
 
@@ -49,6 +53,12 @@ def eval_ast_node(node, context):
         raise NameError("Invalid function call")
     raise TypeError(f"Unsupported expression node: {type(node).__name__}")
 
+def preprocess_expression(expr: str) -> str:
+    expr = re.sub(r'\)\s*([0-9a-zA-Z\(])', r')*\1', expr)
+    expr = re.sub(r'(?<![a-zA-Z])(\d+(?:\.\d+)?)\s*(\(\b[a-zA-Z])', r'\1*\2', expr)
+    expr = re.sub(r'\b(ans|pi|e)\s*\(', r'\1*(', expr)
+    return expr
+
 def evaluate_expression(expr: str, current_ans: float | int=0) -> tuple[float | int | None, str | None]:
     expr = expr.strip()
     if not expr:
@@ -56,6 +66,8 @@ def evaluate_expression(expr: str, current_ans: float | int=0) -> tuple[float | 
 
     if expr.startswith(('+', '-', '*', '/', '**')):
         expr = f"ans{expr}"
+
+    expr = preprocess_expression(expr)
 
     context = {
         "__builtins__": None,
@@ -70,7 +82,7 @@ def evaluate_expression(expr: str, current_ans: float | int=0) -> tuple[float | 
         "abs":abs,
         "e": math.e,
         "pi": math.pi,
-        "ans": 0,
+        "ans": current_ans,
     }
 
     try:
@@ -80,7 +92,10 @@ def evaluate_expression(expr: str, current_ans: float | int=0) -> tuple[float | 
 
     except ZeroDivisionError:
         return None, "Error: division by zero isn't allowed"
-    except (SyntaxError, TypeError, NameError):
-        return None, "Error: check your syntax"
-    except Exception:
-        return None, "Error: calculation"
+    except (SyntaxError, TypeError, ValueError, NameError) as e:
+        print(f"DEBUG AST/Preprocess Error: {e}")
+        return None, f"Error: check your syntax ({e})"
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return None, f"Error: {e}"

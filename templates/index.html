@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewprt" content="initial-scale=1.0">
+    <meta name="viewport" content="initial-scale=1.0">
     <title>Calculator</title>
     <style>
         * {
@@ -79,7 +79,7 @@
             color: #fff;
             padding: 10px 12px;
             font-size: 1rem;
-            border-radius: 6pc;
+            border-radius: 6px;
             outline: none;
         }
 
@@ -125,7 +125,7 @@
 <div class="calculator-card">
     <div class="display-container">
         <div class="status-bar">
-                <span>State: <strong id="ans-display">asn = 0</strong></span>
+                <span>State: <strong id="ans-display">ans = 0</strong></span>
         </div>
 
         <div id="history-log" class="history-log">
@@ -133,12 +133,12 @@
         </div>
 
         <div class="input-group">
-            <input type="text" id="calc-input">
+            <input type="text" id="calc-input" placeholder="eg.sin(radians(90)) or +5" autofocus>
             <button id="send-btn" class="op">==</button>
         </div>
     </div>
 
-    <div class="numpad">
+    <div class="numpad" id="numpad">
         <button class="action" data-val="clear">C</button>
         <button data-val="(">(</button>
         <button data-val=")">)</button>
@@ -168,16 +168,18 @@
         <button data-val="cos(">cos</button>
         <button data-val="sqrt(">sqrt</button>
         <button data-val="pi">pi</button>
+         <button class= "op" data-val="=">=</button>
     </div>
 </div>
 <script>
+    document.addEventListener('DOMContentLoaded', ()=> {
     const calcInput = document.getElementById('calc-input');
     const sendBtn = document.getElementById('send-btn');
     const historyLog = document.getElementById('history-log');
     const ansDisplay = document.getElementById('ans-display');
-    const numpad = document.getElementById('.numpad');
+    const numpad = document.getElementById('numpad');
 
-    function logMessage(text, isErorr = false) {
+    function logMessage(text, isError = false) {
         const item = document.createElement('div');
         item.className = `history-item ${isError ? 'error' : 'success'}`;
         item.textContent = text;
@@ -199,7 +201,7 @@
             const data = await response.json();
 
             if(!response.ok) {
-                logMessage(`>${expression} = ${data.error}`, true);
+                logMessage(`>${expression} -> ${data.error}`, true);
             }
             else{
                 logMessage(`> ${expression} = ${data.result}`);
@@ -221,15 +223,18 @@
             logMessage(`>memory cleared`);
         }
         catch(err){
-            logMessage(`failed to reset memory`, true);
+            logMessage(`>failed to reset memory`, true);
         }
     }
 
-    numpad.addEventListener('click', (e)=> {
-        if(!e.target.matches('button')) return;
-        const val = e.target.getAttribute('data-val')
+    numpad.addEventListener('click', (e) => {
+       const targetBtn = e.target.closest('button');
+       if(!targetBtn) return;
+       const val = targetBtn.getAttribute('data-val');
         if (val === 'clear'){
             clearMemory();}
+        else if (val === '=') {
+            submitCalculation(); }
         else {
             calcInput.value +=val;
             calcInput.focus();
@@ -243,6 +248,7 @@
             submitCalculation();
         }
     });
+});
 </script>
 </body>
 </html>
